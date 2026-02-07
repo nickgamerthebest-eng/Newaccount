@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Account IA</title>
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Segoe UI', sans-serif; transition: 1s; }
+        .container { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; text-align: center; }
+        .card { background: white; padding: 40px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); width: 320px; }
+        .btn { background: #e74c3c; color: white; border: none; padding: 15px 30px; font-size: 16px; border-radius: 50px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; }
+        .loader { display: none; border: 6px solid #f3f3f3; border-top: 6px solid #333; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #status { margin-top: 20px; font-weight: bold; font-size: 18px; color: #333; }
+    </style>
+</head>
+<body id="bg" style="background-color: #e74c3c;"> <div class="container">
+    <div class="card">
+        <h1 id="titulo">New Account</h1>
+        <p id="sub">A IA vai criar sua conta agora</p>
+        
+        <div id="loader" class="loader"></div>
+        
+        <button id="main-btn" class="btn" onclick="processarIA()">CRIAR CONTA AUTOMÁTICO</button>
+        
+        <div id="status">Status: Aguardando...</div>
+    </div>
+</div>
+
+<script>
+function processarIA() {
+    const bg = document.getElementById('bg');
+    const btn = document.getElementById('main-btn');
+    const status = document.getElementById('status');
+    const loader = document.getElementById('loader');
+    const titulo = document.getElementById('titulo');
+
+    // ETAPA 1: VERMELHO (Início / Verificação)
+    btn.style.display = 'none';
+    loader.style.display = 'block';
+    status.innerText = "Etapa 1: Validando Email...";
+
+    // ETAPA 2: AMARELO (Processando no Google)
+    setTimeout(() => {
+        bg.style.backgroundColor = '#f1c40f'; // Amarelo
+        status.innerText = "Etapa 2: IA Criando conta no Google...";
+    }, 2500);
+
+    // ETAPA 3: VERDE (Sucesso Total)
+    setTimeout(() => {
+        bg.style.backgroundColor = '#2ecc71'; // Verde
+        loader.style.display = 'none';
+        titulo.innerText = "Conta Ativa! ✅";
+        status.innerHTML = "Etapa 3: Sua conta foi adicionada!<br><br><small>Clique abaixo para gerenciar</small>";
+        
+        let link = document.createElement("button");
+        link.innerText = "VER MINHA NOVA CONTA";
+        link.style = "margin-top:15px; padding:10px; cursor:pointer; border-radius:10px; border:none; width:100%; background:#333; color:white;";
+        status.appendChild(link);
+    }, 6000);
+}
+</script>
+
+</body>
+</html>
